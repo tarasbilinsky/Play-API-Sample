@@ -29,3 +29,17 @@ Local
 scp -o StrictHostKeyChecking=false ./api/target/universal/api-0.0.1.zip ec2-user@api.marta.intteh.com:api.zip
 
 ssh -o StrictHostKeyChecking=no api.marta.intteh.com
+
+
+
+dynamodb.update_item(
+    TableName='siteVisits',
+    Key={
+        'siteUrl':{'S': "https://www.fernandomc.com/"}
+    },
+    UpdateExpression='SET visits = visits + :inc',
+    ExpressionAttributeValues={
+        ':inc': {'N': '1'}
+    },
+    ReturnValues="UPDATED_NEW"
+)
