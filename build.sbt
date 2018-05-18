@@ -2,11 +2,11 @@ import play.sbt.PlayInternalKeys
 import play.sbt.PlayRunHook
 import play.sbt.run.PlayRun
 
-name := "static"
+name := "api"
 organization := "net.oltiv"
 version := "0.0.1"
 
-lazy val `api` = (project in file(".")).enablePlugins(PlayScala)
+lazy val `api` = (project in file(".")).enablePlugins(PlayScala,JavaServerAppPackaging)
 
 resolvers ++= Seq(
   "Typesafe repository" at "http://repo.typesafe.com/typesafe/releases/",

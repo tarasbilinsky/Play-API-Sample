@@ -1,9 +1,11 @@
 package misc
 
+import org.scalatest.FunSuite
+
 class Test  extends  FunSuite {
 
   test("html"){
-    assert(html(1 == 1)
+    assert(1 == 1)
   }
 
 }
