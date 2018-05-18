@@ -1,0 +1,25 @@
+sudo yum install postgresql96-server.x86_64
+sudo yum install postgresql96.x86_64
+
+sudo mkdir /usr/local/pgsql/data
+sudo chown postgres /usr/local/pgsql/data
+
+sudo useradd postgres
+sudo -i -u postgres
+initdb -D /usr/local/pgsql/data
+postgres -D /usr/local/pgsql/data >logfile 2>&1 &
+psql
+#create schema
+\q
+exit #sudo postgres
+
+sudo yum install java-1.8.0-openjdk.x86_64
+sudo yum install mc
+
+unzip api.zip
+cd ./api-0.0.1/bin
+#replace java with java8 in api, delete api.bat, chmod o+x ./api
+sudo nohup ./api > ./stdout.txt 2>&1 &
+
+TODO
+Make services: postgress and api
