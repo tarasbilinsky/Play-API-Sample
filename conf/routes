@@ -1,3 +1,2 @@
-POST /like/*title  controllers.Likes.like(title)
-GET /like/*title  controllers.Likes.like(title)
-GET /countLikes/*titles controllers.Likes.countLikes(titles)
+POST    /like/*title            controllers.Likes.like(title)
+GET     /countLikes/*titles     controllers.Likes.countLikes(titles)

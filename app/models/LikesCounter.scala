@@ -3,15 +3,12 @@ package models
 import java.time.LocalDateTime
 import java.util.concurrent.atomic.AtomicLong
 
-import akka.http.scaladsl.model.headers.LinkParams.title
 import com.google.inject.ImplementedBy
 import io.getquill._
-
-import scala.collection.concurrent
-import scala.collection.concurrent.TrieMap
-import scala.collection.parallel.mutable.ParTrieMap
-import scala.concurrent.{ExecutionContext, Future}
 import javax.inject._
+
+import scala.collection.concurrent.TrieMap
+import scala.concurrent.{ExecutionContext, Future}
 
 
 case class ResourceId(id:Long) extends AnyVal
@@ -26,6 +23,8 @@ object Resource{
   private val likeSchema = quote {querySchema[models.Like]("likes")}
 
   private val data = TrieMap[String, ResourceId]()
+
+  def add(id:ResourceId, title: String):Unit = data.putIfAbsent(title,id)
 
   private val dummyResourceId = ResourceId(0L)
   def find(title: String)(implicit ec: ExecutionContext):Future[ResourceId] = {
@@ -47,11 +46,11 @@ object Resource{
     ctx.run(q).map(_=>())
   }
 
-  def loadLikes(implicit ec: ExecutionContext):Future[Seq[(String,Long)]] = {
+  def loadLikes(implicit ec: ExecutionContext):Future[Seq[(String,ResourceId,Long)]] = {
     val q = quote {
-      likeSchema.join(query[Resource]).on( (l,r) => l.resourceId==r.id).groupBy{ case (l,r) => r.title}.map {
-        case (title, rr) =>
-          (title, rr.size)
+      likeSchema.join(query[Resource]).on( (l,r) => l.resourceId==r.id).groupBy{ case (_,r) => (r.title,r.id)}.map {
+        case ( (title, id), rr) =>
+          (title, id, rr.size)
       }
     }
 
@@ -75,12 +74,12 @@ trait LikesCounter {
 }
 
 @Singleton
-class LikesCounterPersistent extends LikesCounter {
+class LikesCounterPersistent @Inject() (implicit ec: ExecutionContext) extends LikesCounter {
 
-  implicit private val ec:ExecutionContext = ExecutionContext.global //TODO create and inject separate execution context for db writes
-  Resource.loadLikes.foreach { f =>
+  Resource.loadLikes(ec).foreach { f =>
     f.foreach {
-      case (title, n) =>
+      case (title, id, n) =>
+        Resource.add(id,title)
         val e = data.putIfAbsent(title, new AtomicLong(n))
         e.map(_.addAndGet(n))
     }
