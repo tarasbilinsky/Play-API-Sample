@@ -17,6 +17,8 @@ resolvers ++= Seq(
 
 libraryDependencies ++= Seq(guice,
 
+  "io.getquill" %% "quill-async-postgres" % "2.4.2",
+
   "org.scalamock" %% "scalamock-scalatest-support" % "3.6.0" % Test,
   "org.scalatestplus.play" %% "scalatestplus-play" % "3.1.2" % Test,
   "org.scalacheck" %% "scalacheck" % "1.13.5" % Test,
